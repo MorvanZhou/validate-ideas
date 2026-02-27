@@ -16,3 +16,5 @@ dist/
 *.log
 
 .codebuddy
+.agents
+skills-lock.json
