@@ -53,7 +53,7 @@ python3 scripts/producthunt_trending.py --topic productivity --days 3
    python3 scripts/xiaohongshu_search.py --input tmp/xhs_response.json
    ```
 
-3. **用户不想使用 Playwright 时**：在 `.env.idea2mvp` 中设置 `SKIP_XHS_PLAYWRIGHT=true`，后续搜索将跳过小红书 Playwright 模式，改用 `web_search` 搜索小红书相关内容作为替代。
+3. **用户不想使用 Playwright 时**：在 `.env.idea2mvp` 中设置 `SKIP_XHS_PLAYWRIGHT=true`，后续直接跳过小红书搜索（小红书未开放公网搜索，搜索引擎无法抓取其内容，`web_search` 搜不到有效结果）。
 
 **推荐关键词**：`效率工具推荐`、`好用的小众app`、`独立开发者 产品推荐`、`宝藏app推荐`、`AI工具推荐`
 
@@ -142,7 +142,7 @@ python3 scripts/github_trending.py --days 90 --lang typescript --min-stars 200
 
 2. **小红书**：询问用户是否愿意使用 Playwright 控制浏览器登录并搜索小红书（需扫码登录、安装 Playwright 依赖）。**提醒用户：自动化操作存在被平台检测到反爬而封号的风险，请用户自行评估后决定。**
    - 用户愿意 → 使用 `scripts/xiaohongshu_search.py` 搜索
-   - 用户不愿意 → 在 `.env.idea2mvp` 中写入 `SKIP_XHS_PLAYWRIGHT=true`，后续跳过 Playwright 模式，改用 `web_search` 搜索小红书相关内容
+   - 用户不愿意 → 在 `.env.idea2mvp` 中写入 `SKIP_XHS_PLAYWRIGHT=true`，后续直接跳过小红书搜索（小红书未开放公网搜索，搜索引擎无法抓取其内容）
 
 > 偏好一旦写入 `.env.idea2mvp`，后续搜索自动跳过确认步骤，直接按偏好执行。用户可随时手动修改 `.env.idea2mvp` 中的配置来调整偏好。
 
@@ -150,7 +150,7 @@ python3 scripts/github_trending.py --days 90 --lang typescript --min-stars 200
 1. Product Hunt 精选产品（`scripts/producthunt_trending.py`，或 `web_search` 如设置了 `SKIP_PH_API=true`） → `tmp/ph_results.txt`
 2. V2EX 热门/最新话题（`scripts/v2ex_topics.py`） → `tmp/v2ex_results.txt`
 3. GitHub 工具项目（`scripts/github_trending.py`） → `tmp/github_results.txt`
-4. 小红书热门工具推荐（`scripts/xiaohongshu_search.py`，或 `web_search` 如设置了 `SKIP_XHS_PLAYWRIGHT=true`） → `tmp/xhs_results.txt`
+4. 小红书热门工具推荐（`scripts/xiaohongshu_search.py`，如设置了 `SKIP_XHS_PLAYWRIGHT=true` 则跳过） → `tmp/xhs_results.txt`
 5. 少数派（`scripts/sspai_search.py`）→ `tmp/sspai_results.txt`
 6. Indie Hackers（`scripts/indiehackers_search.py`）→ `tmp/ih_results.txt`
 7. 其他独立开发者社区/英文社区（`web_search`）

@@ -24,7 +24,7 @@ ENV_TEMPLATE = """\
 # 获取方式：https://github.com/settings/tokens → Generate new token
 # GITHUB_TOKEN=your_token_here
 
-# 跳过小红书 Playwright 浏览器搜索（设为 true 则改用 web_search 替代）
+# 跳过小红书 Playwright 浏览器搜索（设为 true 则直接跳过小红书搜索，小红书未开放公网搜索）
 # SKIP_XHS_PLAYWRIGHT=true
 """
 

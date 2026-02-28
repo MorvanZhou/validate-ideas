@@ -23,7 +23,7 @@ description: "Help users discover product ideas, validate them, and build MVPs. 
 **执行**：读取 `references/find-ideas.md`，按照其中的搜索策略、筛选标准、Idea 扩展方法和报告模板执行。在与用户讨论的过程中，留意用户透露的行业背景、产品偏好、技术经验等信息，记录到 `user-profile.md`。
 
 **核心步骤**：
-1. **确认搜索偏好**：检查 `.env.idea2mvp`，如未配置偏好则询问用户：是否配置 Product Hunt Token 以使用 API 搜索？是否使用 Playwright 控制浏览器搜索小红书？用户选择跳过的数据源会写入 `.env.idea2mvp`（`SKIP_PH_API=true` / `SKIP_XHS_PLAYWRIGHT=true`），后续自动跳过不再询问，改用 `web_search` 替代
+1. **确认搜索偏好**：检查 `.env.idea2mvp`，如未配置偏好则询问用户：是否配置 Product Hunt Token 以使用 API 搜索？是否使用 Playwright 控制浏览器搜索小红书？用户选择跳过的数据源会写入 `.env.idea2mvp`（`SKIP_PH_API=true` / `SKIP_XHS_PLAYWRIGHT=true`），后续自动跳过不再询问。注意：小红书未开放公网搜索，跳过 Playwright 时直接跳过小红书搜索，不使用 `web_search` 替代
 2. 并行搜索 Product Hunt、中文社区（小红书/V2EX/少数派）、Indie Hackers、独立开发者社区、GitHub Trending
 3. 筛选 5-8 个最有启发性的工具，深度分析痛点和模式
 4. 生成 5 个可拓展的产品 Ideas
@@ -138,7 +138,7 @@ description: "Help users discover product ideas, validate them, and build MVPs. 
 - **`scripts/producthunt_trending.py`** — 通过 Product Hunt 官方 API v2 获取热门产品。需在 `.env.idea2mvp` 配置 `PRODUCTHUNT_TOKEN`。若用户设置了 `SKIP_PH_API=true` 则跳过脚本，改用 `web_search`。
 - **`scripts/github_trending.py`** — 通过 GitHub Search API 搜索近期热门工具类项目。支持按天数、星数、语言、主题过滤。无需 Token。阶段一搜索 GitHub 时优先使用。
 - **`scripts/v2ex_topics.py`** — 通过 V2EX 公开 API 获取热门/最新话题。无需认证。支持关键词过滤和工具话题筛选。阶段一搜索中文社区时优先使用。
-- **`scripts/xiaohongshu_search.py`** — 使用 Playwright 自动化浏览器搜索小红书笔记。模拟真人操作（搜索 → 逐个点入详情页提取完整内容），需首次扫码登录。若用户设置了 `SKIP_XHS_PLAYWRIGHT=true` 则跳过脚本，改用 `web_search`。
+- **`scripts/xiaohongshu_search.py`** — 使用 Playwright 自动化浏览器搜索小红书笔记。模拟真人操作（搜索 → 逐个点入详情页提取完整内容），需首次扫码登录。若用户设置了 `SKIP_XHS_PLAYWRIGHT=true` 则直接跳过小红书搜索（小红书未开放公网搜索，搜索引擎无法抓取）。
 - **`scripts/sspai_search.py`** — 通过少数派搜索 API 获取工具/产品相关文章。无需认证。支持单/多关键词搜索，自动去重、按点赞数排序。还支持 `--detail <id>` 获取文章完整正文内容。阶段一搜索中文社区时优先使用。
 - **`scripts/indiehackers_search.py`** — 通过 Indie Hackers 内置的 Algolia 搜索 API 获取独立开发者产品。无需认证。返回产品名称、月收入、领域标签、商业模式等。支持 `--min-revenue` 过滤低收入产品。阶段一搜索英文独立开发者社区时优先使用。
 
