@@ -295,28 +295,9 @@ python3 scripts/github_trending.py --days 90 --lang typescript --min-stars 200
 如果以上任何 Idea 让你感兴趣，我们可以深入聊聊，然后我帮你生成一份**灵感确认文档**，作为后续想法验证的起点。
 ```
 
-**报告输出后：可邮件通知**
+**报告输出后：邮件通知**
 
-报告生成完毕后，检查 `.env.idea2mvp` 中是否已配置邮件相关参数（`EMAIL_SMTP_HOST`、`EMAIL_SENDER`、`EMAIL_PASSWORD`、`EMAIL_RECEIVER` 均已配置且非注释状态）。如果已配置，则自动将报告内容通过 `scripts/send_email.py` 发送到用户邮箱；如果未配置，跳过此步骤，不询问用户。
-
-```bash
-# 将报告正文作为邮件内容发送
-python3 scripts/send_email.py --subject "工具探索报告 - {当前日期}" --body "报告正文内容..."
-
-# 或将 tmp/ 下的搜索结果文件合并发送
-python3 scripts/send_email.py --subject "工具探索报告 - {当前日期}" --file tmp/ph_results.txt tmp/github_results.txt tmp/v2ex_results.txt
-```
-
-> `send_email.py` 仅使用 Python 标准库（smtplib），无额外依赖。支持 `--body`（文本）、`--file`（文件，支持多个）、stdin 三种内容输入方式，支持 `--to` 覆盖默认收件人。
-
-**常用邮箱 SMTP 配置参考**：
-
-| 邮箱 | SMTP 地址 | 端口 | 授权码获取 |
-|------|----------|------|-----------|
-| QQ 邮箱 | smtp.qq.com | 465 | 设置 → 账户 → POP3/SMTP → 生成授权码 |
-| Gmail | smtp.gmail.com | 465 | Google 账户 → 安全 → 应用专用密码 |
-| 163 邮箱 | smtp.163.com | 465 | 设置 → POP3/SMTP → 开启并获取授权码 |
-| Outlook | smtp.office365.com | 587 | 直接使用登录密码 |
+报告生成完毕后，按照 `references/send-email.md` 中的说明检查邮件配置并发送报告。
 
 ## 五、灵感确认文档
 
