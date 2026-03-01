@@ -1,6 +1,6 @@
 ---
 name: idea2mvp
-description: "Help users discover product ideas, validate them, and build MVPs. Covers: searching trending tools and products across platforms (Product Hunt, GitHub, Indie Hackers, XiaoHongShu, V2EX, SSPAI, etc.), exploring market trends, analyzing indie products, generating product ideas from pain points, validating feasibility through market research and competitive analysis, building minimum viable products, and sending reports or content via email notification. Triggers: 'find ideas', 'search products', 'explore tools', 'trending tools', 'product ideas', 'what to build', 'validate my idea', 'is this idea viable', 'build MVP', 'idea to product', 'market research', 'competitive analysis', 'indie hacker', 'side project ideas', 'send email', 'email report', 'send notification', '找想法', '搜产品', '找灵感', '产品调研', '做什么产品', '验证想法', '构建MVP', '发邮件', '邮件通知', '发送报告', or any task related to product discovery, idea exploration, idea validation, MVP development, or email notification."
+description: "Discover product ideas, validate them, and build MVPs. Search trending tools across Product Hunt, GitHub, Indie Hackers, XiaoHongShu, V2EX, SSPAI, etc. Validate feasibility via market research and competitive analysis. Build MVPs. Send reports via email. Triggers: 'find ideas', 'search products', 'trending tools', 'product ideas', 'validate my idea', 'build MVP', 'market research', 'competitive analysis', 'indie hacker', 'send email', '找想法', '搜产品', '找灵感', '产品调研', '验证想法', '构建MVP', '发邮件', '发送报告'."
 ---
 
 # Idea → MVP：从灵感发现到产品落地
