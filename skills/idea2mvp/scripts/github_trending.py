@@ -2,7 +2,7 @@
 """
 GitHub Trending Tool Finder - 一步获取近期热门工具类项目
 
-流程全自动：搜索 → 过滤 → 生成纯文本摘要 → 保存到 tmp/github_results.txt
+流程全自动：搜索 → 过滤 → 生成纯文本摘要 → 保存到 data/search-results/github_results.txt
 
 无需 GitHub Token（未认证限 10 次/分钟，认证后 30 次/分钟）。
 如需更高速率，可设置环境变量 GITHUB_TOKEN。
@@ -23,11 +23,12 @@ import urllib.request
 import urllib.error
 from datetime import datetime, timedelta
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from utils import SEARCH_RESULTS_DIR, ensure_dirs
 
 API_URL = "https://api.github.com/search/repositories"
 
-TMP_DIR = os.path.join(os.getcwd(), "tmp")
-RESULT_FILE = os.path.join(TMP_DIR, "github_results.txt")
+RESULT_FILE = os.path.join(SEARCH_RESULTS_DIR, "github_results.txt")
 
 EXCLUDE_KEYWORDS = [
     "framework", "library", "database", "cloud", "infrastructure",
@@ -35,8 +36,8 @@ EXCLUDE_KEYWORDS = [
 ]
 
 
-def _ensure_tmp_dir():
-    os.makedirs(TMP_DIR, exist_ok=True)
+def _ensure_output_dir():
+    ensure_dirs()
 
 
 def search_github(query, sort="stars", order="desc", per_page=30, page=1, token=None):
@@ -132,7 +133,7 @@ def main():
         sys.exit(1)
 
     text = format_as_text(tools, query)
-    _ensure_tmp_dir()
+    _ensure_output_dir()
     with open(RESULT_FILE, "w", encoding="utf-8") as f:
         f.write(text)
     print(text)

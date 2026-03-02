@@ -2,12 +2,45 @@
 """
 idea2mvp 脚本公共工具模块
 
-提供 .env.idea2mvp 配置文件的自动创建和加载功能。
+统一管理 skill 的运行时数据目录结构（遵循 .skills-data 规范）：
+
+    <project_root>/.skills-data/idea2mvp/
+        .env            — 配置文件（Token、偏好、邮件等）
+        data/           — 持久化数据
+            search-results/ — 各平台搜索结果（ph_results.txt、github_results.txt 等）
+            user-profile.md、idea-brief/、报告等
+        cache/          — 可安全删除的缓存（如浏览器数据）
+        logs/           — 日志文件
+
+skill 源码（SKILL.md、scripts/、references/）保持不可变。
 """
 
 import os
 
-ENV_FILE = os.path.join(os.getcwd(), ".env.idea2mvp")
+# ---------------------------------------------------------------------------
+# 核心路径
+# ---------------------------------------------------------------------------
+
+SKILL_NAME = "idea2mvp"
+
+# 项目根目录（运行脚本时的工作目录）
+PROJECT_ROOT = os.getcwd()
+
+# 运行时数据根目录
+SKILL_DATA_DIR = os.path.join(PROJECT_ROOT, ".skills-data", SKILL_NAME)
+
+# 各子目录
+DATA_DIR = os.path.join(SKILL_DATA_DIR, "data")
+SEARCH_RESULTS_DIR = os.path.join(DATA_DIR, "search-results")
+CACHE_DIR = os.path.join(SKILL_DATA_DIR, "cache")
+LOGS_DIR = os.path.join(SKILL_DATA_DIR, "logs")
+
+# 配置文件
+ENV_FILE = os.path.join(SKILL_DATA_DIR, ".env")
+
+# ---------------------------------------------------------------------------
+# .env 模板
+# ---------------------------------------------------------------------------
 
 ENV_TEMPLATE = """\
 # idea2mvp 配置文件
@@ -36,8 +69,19 @@ ENV_TEMPLATE = """\
 """
 
 
+# ---------------------------------------------------------------------------
+# 目录初始化
+# ---------------------------------------------------------------------------
+
+def ensure_dirs():
+    """确保运行时数据目录结构存在。"""
+    for d in (SKILL_DATA_DIR, DATA_DIR, SEARCH_RESULTS_DIR, CACHE_DIR, LOGS_DIR):
+        os.makedirs(d, exist_ok=True)
+
+
 def ensure_env_file():
-    """确保 .env.idea2mvp 文件存在，不存在则创建模板并提示用户。"""
+    """确保 .env 文件存在，不存在则创建模板并提示用户。"""
+    ensure_dirs()
     if os.path.exists(ENV_FILE):
         return
     with open(ENV_FILE, "w", encoding="utf-8") as f:
@@ -50,7 +94,7 @@ def ensure_env_file():
 
 
 def load_env():
-    """加载 .env.idea2mvp 配置文件到环境变量（不覆盖已有环境变量）。
+    """加载 .env 配置文件到环境变量（不覆盖已有环境变量）。
 
     自动调用 ensure_env_file() 确保文件存在。
     """

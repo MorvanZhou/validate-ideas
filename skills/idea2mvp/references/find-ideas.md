@@ -8,30 +8,30 @@
 
 #### Product Hunt
 
-**使用脚本**：运行 `scripts/producthunt_trending.py`，通过官方 API v2 获取热门产品，结果自动保存为纯文本到 `tmp/ph_results.txt`。
+**使用脚本**：运行 `scripts/producthunt_trending.py`，通过官方 API v2 获取热门产品，结果自动保存为纯文本到 `.skills-data/idea2mvp/data/search-results/ph_results.txt`。
 
-> Token 从工作目录的 `.env.idea2mvp` 文件自动读取（也支持环境变量）。如未配置，需先询问用户是否愿意配置（见下方搜索执行策略）。
+> Token 从 `.skills-data/idea2mvp/.env` 文件自动读取（也支持环境变量）。如未配置，需先询问用户是否愿意配置（见下方搜索执行策略）。
 
 **执行流程**：
-1. 直接运行脚本（脚本自动从 `.env.idea2mvp` 读取 Token，无需手动 export）
+1. 直接运行脚本（脚本自动从 `.skills-data/idea2mvp/.env` 读取 Token，无需手动 export）
 ```bash
 python3 scripts/producthunt_trending.py
 python3 scripts/producthunt_trending.py --days 7 --limit 20
 python3 scripts/producthunt_trending.py --topic productivity --days 3
 ```
-2. **用户不想配置 Token 时**（`.env.idea2mvp` 中 `SKIP_PH_API=true`）：使用 `web_search` 搜索 PH 相关信息
+2. **用户不想配置 Token 时**（`.skills-data/idea2mvp/.env` 中 `SKIP_PH_API=true`）：使用 `web_search` 搜索 PH 相关信息
   - `"Product Hunt" best new tools {月份} {年份}`
   - `"Product Hunt" trending productivity tools {年份}`
   - `site:producthunt.com top products this week`
 
-> Token 配置方式：在工作目录创建 `.env.idea2mvp`，写入 `PRODUCTHUNT_TOKEN=your_token`
+> Token 配置方式：在 `.skills-data/idea2mvp/.env` 中写入 `PRODUCTHUNT_TOKEN=your_token`
 > Token 获取：https://www.producthunt.com/v2/oauth/applications → 创建应用 → Developer Token
 
 **常用 topic**：`productivity`、`developer-tools`、`artificial-intelligence`、`design-tools`、`marketing`、`fintech`、`education`
 
 #### 中文社区
 
-**小红书**：运行 `scripts/xiaohongshu_search.py` 搜索笔记，结果自动保存到 `tmp/xhs_results.txt`。
+**小红书**：运行 `scripts/xiaohongshu_search.py` 搜索笔记，结果自动保存到 `.skills-data/idea2mvp/data/search-results/xhs_results.txt`。
 
 脚本使用 Playwright 控制浏览器，模拟真人操作：打开首页 → 搜索框输入关键词 → 逐个点击笔记卡片进入详情页 → 提取正文、标签、互动数据等完整信息 → 关闭详情返回列表。全程加入随机延迟、鼠标移动、渐进滚动等反爬策略。
 
@@ -50,14 +50,14 @@ python3 scripts/producthunt_trending.py --topic productivity --days 3
 
 2. **从 JSON 解析**（离线模式，已有数据时）：
    ```bash
-   python3 scripts/xiaohongshu_search.py --input tmp/xhs_response.json
+   python3 scripts/xiaohongshu_search.py --input .skills-data/idea2mvp/data/search-results/xhs_response.json
    ```
 
-3. **用户不想使用 Playwright 时**：在 `.env.idea2mvp` 中设置 `SKIP_XHS_PLAYWRIGHT=true`，后续直接跳过小红书搜索（小红书未开放公网搜索，搜索引擎无法抓取其内容，`web_search` 搜不到有效结果）。
+3. **用户不想使用 Playwright 时**：在 `.skills-data/idea2mvp/.env` 中设置 `SKIP_XHS_PLAYWRIGHT=true`，后续直接跳过小红书搜索（小红书未开放公网搜索，搜索引擎无法抓取其内容，`web_search` 搜不到有效结果）。
 
 **推荐关键词**：`效率工具推荐`、`好用的小众app`、`独立开发者 产品推荐`、`宝藏app推荐`、`AI工具推荐`
 
-**V2EX**（✅ 免费公开 API，无需认证）：运行 `scripts/v2ex_topics.py`，从产品相关节点（分享创造、分享发现）获取话题，自动过滤出工具/产品/独立开发相关内容，结果保存到 `tmp/v2ex_results.txt`。
+**V2EX**（✅ 免费公开 API，无需认证）：运行 `scripts/v2ex_topics.py`，从产品相关节点（分享创造、分享发现）获取话题，自动过滤出工具/产品/独立开发相关内容，结果保存到 `.skills-data/idea2mvp/data/search-results/v2ex_results.txt`。
 
 ```bash
 python3 scripts/v2ex_topics.py                          # 默认从 分享创造 + 分享发现 节点获取，自动过滤工具相关话题
@@ -71,7 +71,7 @@ python3 scripts/v2ex_topics.py --pages 2                   # 每个节点获取 
 
 > ⚠️ `web_search` 的 `site:v2ex.com` 实测无效，务必使用脚本 API。
 
-**少数派**（✅ 免费公开 API，无需认证）：运行 `scripts/sspai_search.py`，通过少数派搜索 API 获取文章，自动按点赞数排序并去重，结果保存到 `tmp/sspai_results.txt`。还支持通过文章 ID 获取完整正文内容（详情保存到 `tmp/sspai_detail.txt`）。
+**少数派**（✅ 免费公开 API，无需认证）：运行 `scripts/sspai_search.py`，通过少数派搜索 API 获取文章，自动按点赞数排序并去重，结果保存到 `.skills-data/idea2mvp/data/search-results/sspai_results.txt`。还支持通过文章 ID 获取完整正文内容（详情保存到 `.skills-data/idea2mvp/data/search-results/sspai_detail.txt`）。
 
 ```bash
 # 搜索文章列表
@@ -89,7 +89,7 @@ python3 scripts/sspai_search.py --detail 60079 73051 55239     # 多篇文章详
 
 #### Indie Hackers
 
-**Indie Hackers**（✅ 免费 Algolia 搜索 API，无需认证）：运行 `scripts/indiehackers_search.py`，通过 Indie Hackers 内置的 Algolia 搜索 API 获取独立开发者产品信息，自动按月收入排序并去重，结果保存到 `tmp/ih_results.txt`。
+**Indie Hackers**（✅ 免费 Algolia 搜索 API，无需认证）：运行 `scripts/indiehackers_search.py`，通过 Indie Hackers 内置的 Algolia 搜索 API 获取独立开发者产品信息，自动按月收入排序并去重，结果保存到 `.skills-data/idea2mvp/data/search-results/ih_results.txt`。
 
 ```bash
 python3 scripts/indiehackers_search.py                                    # 默认搜索: productivity tool, AI tool, developer tool, side project
@@ -107,7 +107,7 @@ python3 scripts/indiehackers_search.py --keyword "AI" --min-revenue 100   # 只�
 
 #### GitHub Trending
 
-**使用脚本**：运行 `scripts/github_trending.py`，结果自动保存到 `tmp/github_results.txt`。
+**使用脚本**：运行 `scripts/github_trending.py`，结果自动保存到 `.skills-data/idea2mvp/data/search-results/github_results.txt`。
 
 ```bash
 python3 scripts/github_trending.py
@@ -116,7 +116,7 @@ python3 scripts/github_trending.py --lang python --topic cli
 python3 scripts/github_trending.py --days 90 --lang typescript --min-stars 200
 ```
 
-无需 Token，如需更高速率可在 `.env.idea2mvp` 中配置 `GITHUB_TOKEN`。
+无需 Token，如需更高速率可在 `.skills-data/idea2mvp/.env` 中配置 `GITHUB_TOKEN`。
 
 **备用 web_search**（API 不可用时）：
 - `GitHub trending tool CLI utility {月份} {年份}`
@@ -130,29 +130,29 @@ python3 scripts/github_trending.py --days 90 --lang typescript --min-stars 200
 
 ### 搜索执行策略
 
-> 所有脚本都会自动将结果保存为纯文本到 `tmp/` 目录，可通过 `read_file` 读取纯文本结果，节省 token。
+> 所有脚本都会自动将结果保存为纯文本到 `.skills-data/idea2mvp/data/search-results/` 目录，可通过 `read_file` 读取纯文本结果，节省 token。
 
 **第零步：确认用户搜索偏好**
 
-在执行搜索前，先读取 `.env.idea2mvp` 检查是否已有偏好配置。如果以下配置项**不存在**，则向用户确认：
+在执行搜索前，先读取 `.skills-data/idea2mvp/.env` 检查是否已有偏好配置。如果以下配置项**不存在**，则向用户确认：
 
 1. **Product Hunt**：是否已配置 `PRODUCTHUNT_TOKEN`？如未配置，询问用户是否愿意配置 Token 以使用 API 搜索。
    - 用户愿意 → 引导配置 Token，使用脚本搜索
-   - 用户不愿意 → 在 `.env.idea2mvp` 中写入 `SKIP_PH_API=true`，后续跳过脚本，改用 `web_search` 搜索 Product Hunt 信息
+   - 用户不愿意 → 在 `.skills-data/idea2mvp/.env` 中写入 `SKIP_PH_API=true`，后续跳过脚本，改用 `web_search` 搜索 Product Hunt 信息
 
 2. **小红书**：询问用户是否愿意使用 Playwright 控制浏览器登录并搜索小红书（需扫码登录、安装 Playwright 依赖）。**提醒用户：自动化操作存在被平台检测到反爬而封号的风险，请用户自行评估后决定。**
    - 用户愿意 → 使用 `scripts/xiaohongshu_search.py` 搜索
-   - 用户不愿意 → 在 `.env.idea2mvp` 中写入 `SKIP_XHS_PLAYWRIGHT=true`，后续直接跳过小红书搜索（小红书未开放公网搜索，搜索引擎无法抓取其内容）
+   - 用户不愿意 → 在 `.skills-data/idea2mvp/.env` 中写入 `SKIP_XHS_PLAYWRIGHT=true`，后续直接跳过小红书搜索（小红书未开放公网搜索，搜索引擎无法抓取其内容）
 
-> 偏好一旦写入 `.env.idea2mvp`，后续搜索自动跳过确认步骤，直接按偏好执行。用户可随时手动修改 `.env.idea2mvp` 中的配置来调整偏好。
+> 偏好一旦写入 `.skills-data/idea2mvp/.env`，后续搜索自动跳过确认步骤，直接按偏好执行。用户可随时手动修改配置来调整偏好。
 
 **第一轮（并行 5-6 个搜索）**：
-1. Product Hunt 精选产品（`scripts/producthunt_trending.py`，或 `web_search` 如设置了 `SKIP_PH_API=true`） → `tmp/ph_results.txt`
-2. V2EX 热门/最新话题（`scripts/v2ex_topics.py`） → `tmp/v2ex_results.txt`
-3. GitHub 工具项目（`scripts/github_trending.py`） → `tmp/github_results.txt`
-4. 小红书热门工具推荐（`scripts/xiaohongshu_search.py`，如设置了 `SKIP_XHS_PLAYWRIGHT=true` 则跳过） → `tmp/xhs_results.txt`
-5. 少数派（`scripts/sspai_search.py`）→ `tmp/sspai_results.txt`
-6. Indie Hackers（`scripts/indiehackers_search.py`）→ `tmp/ih_results.txt`
+1. Product Hunt 精选产品（`scripts/producthunt_trending.py`，或 `web_search` 如设置了 `SKIP_PH_API=true`） → `.skills-data/idea2mvp/data/search-results/ph_results.txt`
+2. V2EX 热门/最新话题（`scripts/v2ex_topics.py`） → `.skills-data/idea2mvp/data/search-results/v2ex_results.txt`
+3. GitHub 工具项目（`scripts/github_trending.py`） → `.skills-data/idea2mvp/data/search-results/github_results.txt`
+4. 小红书热门工具推荐（`scripts/xiaohongshu_search.py`，如设置了 `SKIP_XHS_PLAYWRIGHT=true` 则跳过） → `.skills-data/idea2mvp/data/search-results/xhs_results.txt`
+5. 少数派（`scripts/sspai_search.py`）→ `.skills-data/idea2mvp/data/search-results/sspai_results.txt`
+6. Indie Hackers（`scripts/indiehackers_search.py`）→ `.skills-data/idea2mvp/data/search-results/ih_results.txt`
 7. 其他独立开发者社区/英文社区（`web_search`）
 
 **第二轮（根据第一轮结果补充，并行 2-3 个搜索）**：
@@ -228,17 +228,35 @@ python3 scripts/github_trending.py --days 90 --lang typescript --min-stars 200
 
 ## 四、报告输出模板
 
-**生成报告前**：先通过 `read_file` 加载 `tmp/` 目录下的搜索结果文件，作为归纳总结的参考素材：
+**生成报告前**：
 
-- `tmp/ph_results.txt` — Product Hunt 热门产品
-- `tmp/v2ex_results.txt` — V2EX 产品/工具话题
-- `tmp/github_results.txt` — GitHub 热门项目
-- `tmp/xhs_results.txt` — 小红书笔记
-- `tmp/sspai_results.txt` — 少数派文章
-- `tmp/sspai_detail.txt` — 少数派文章详情（如有）
-- `tmp/ih_results.txt` — Indie Hackers 产品
+1. **去重**：运行 `python3 scripts/seen_tools.py read` 获取历次报告中已推荐过的工具/产品名称列表（默认保留最近 90 天，自动清理过期记录）。在后续筛选中跳过这些已推荐过的工具，确保报告只呈现新发现的内容。如果某个工具在新一轮搜索中有**重大更新**（如新版本、转型、被收购等），可以再次纳入并注明"更新推荐"。
+
+2. **加载搜索结果**：通过 `read_file` 加载 `.skills-data/idea2mvp/data/search-results/` 目录下的搜索结果文件，作为归纳总结的参考素材：
+
+- `.skills-data/idea2mvp/data/search-results/ph_results.txt` — Product Hunt 热门产品
+- `.skills-data/idea2mvp/data/search-results/v2ex_results.txt` — V2EX 产品/工具话题
+- `.skills-data/idea2mvp/data/search-results/github_results.txt` — GitHub 热门项目
+- `.skills-data/idea2mvp/data/search-results/xhs_results.txt` — 小红书笔记
+- `.skills-data/idea2mvp/data/search-results/sspai_results.txt` — 少数派文章
+- `.skills-data/idea2mvp/data/search-results/sspai_detail.txt` — 少数派文章详情（如有）
+- `.skills-data/idea2mvp/data/search-results/ih_results.txt` — Indie Hackers 产品
 
 > 只加载实际存在的文件。基于这些原始数据进行筛选、交叉比对和归纳，确保报告中的推荐和洞察有据可依。
+
+**报告输出后**：运行脚本将本次推荐的工具追加到去重记录：
+
+```bash
+python3 scripts/seen_tools.py add --tools "ToolName1|一句话定位" "ToolName2|一句话定位"
+```
+
+也支持 JSON 格式批量写入：
+
+```bash
+python3 scripts/seen_tools.py add --json '[{"name":"ToolA","desc":"描述"},{"name":"ToolB","desc":"描述"}]'
+```
+
+记录存储在 `.skills-data/idea2mvp/data/seen-tools.jsonl`，读取时自动清理超过 90 天的过期条目，文件不会无限膨胀。
 
 ```markdown
 ## 🛠️ 工具探索报告 - {当前日期}
@@ -299,7 +317,7 @@ python3 scripts/github_trending.py --days 90 --lang typescript --min-stars 200
 
 阶段一沟通完成后，询问用户是否生成灵感确认文档。此文档记录沟通中的关键信息，作为阶段二的输入上下文。
 
-**文件名**：`idea-brief.md`，保存至项目工作目录。
+**文件名**：以时间戳命名，保存至 `.skills-data/idea2mvp/data/idea-brief/` 目录，格式为 `{YYYY-MM-DD_HHmm}.md`（如 `2026-03-02_1430.md`）。
 
 **模板**：
 

@@ -5,7 +5,7 @@
 将搜索报告或其他文本内容通过邮件发送给用户。
 支持从 stdin、文件或命令行参数传入内容。
 
-需要环境变量（在 .env.idea2mvp 中配置）：
+需要环境变量（在 .skills-data/idea2mvp/.env 中配置）：
   EMAIL_SMTP_HOST     — SMTP 服务器地址（如 smtp.qq.com、smtp.gmail.com）
   EMAIL_SMTP_PORT     — SMTP 端口（默认 465，SSL）
   EMAIL_SENDER        — 发件人邮箱
@@ -17,13 +17,13 @@
   python3 send_email.py --subject "工具探索报告" --body "报告正文内容..."
 
   # 从文件读取内容发送
-  python3 send_email.py --subject "工具探索报告" --file tmp/ph_results.txt
+  python3 send_email.py --subject "工具探索报告" --file data/search-results/ph_results.txt
 
   # 发送多个文件内容（合并为一封邮件）
-  python3 send_email.py --subject "工具探索报告" --file tmp/ph_results.txt tmp/github_results.txt
+  python3 send_email.py --subject "工具探索报告" --file data/search-results/ph_results.txt data/search-results/github_results.txt
 
   # 从 stdin 读取内容
-  cat tmp/ph_results.txt | python3 send_email.py --subject "工具探索报告"
+  cat data/search-results/ph_results.txt | python3 send_email.py --subject "工具探索报告"
 
   # 指定收件人（覆盖 .env 中的默认收件人）
   python3 send_email.py --subject "报告" --body "内容" --to someone@example.com
@@ -245,7 +245,7 @@ def send_email(subject, body, receiver=None, is_html=False):
         missing.append("EMAIL_RECEIVER")
     if missing:
         print(f"❌ 缺少邮件配置：{', '.join(missing)}", flush=True)
-        print("   请在 .env.idea2mvp 中配置邮件相关参数。", flush=True)
+        print("   请在 .skills-data/idea2mvp/.env 中配置邮件相关参数。", flush=True)
         return False
 
     msg = MIMEMultipart()

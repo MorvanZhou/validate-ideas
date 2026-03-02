@@ -19,10 +19,8 @@ dist/
 .agents
 .claude
 skills-lock.json
-user-profile.md
 
-# Temporary files (cookie/hash cache, API responses)
-tmp/
 
 # Local secrets
 .env.idea2mvp
+.skills-data

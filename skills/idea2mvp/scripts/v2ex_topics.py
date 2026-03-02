@@ -22,8 +22,10 @@ import urllib.request
 import urllib.error
 from datetime import datetime
 
-TMP_DIR = os.path.join(os.getcwd(), "tmp")
-RESULT_FILE = os.path.join(TMP_DIR, "v2ex_results.txt")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from utils import SEARCH_RESULTS_DIR, ensure_dirs
+
+RESULT_FILE = os.path.join(SEARCH_RESULTS_DIR, "v2ex_results.txt")
 
 # 产品/工具相关的核心节点
 PRODUCT_NODES = {
@@ -53,8 +55,8 @@ TOOL_KEYWORDS = [
 ]
 
 
-def _ensure_tmp_dir():
-    os.makedirs(TMP_DIR, exist_ok=True)
+def _ensure_output_dir():
+    ensure_dirs()
 
 
 def fetch_node_topics(node_name, page=1):
@@ -181,7 +183,7 @@ def main():
     filtered.sort(key=lambda t: t.get("replies", 0), reverse=True)
 
     text = format_as_text(filtered, nodes)
-    _ensure_tmp_dir()
+    _ensure_output_dir()
     with open(RESULT_FILE, "w", encoding="utf-8") as f:
         f.write(text)
     print(text)

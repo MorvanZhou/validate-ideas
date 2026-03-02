@@ -27,8 +27,10 @@ import urllib.request
 import urllib.error
 from datetime import datetime
 
-TMP_DIR = os.path.join(os.getcwd(), "tmp")
-RESULT_FILE = os.path.join(TMP_DIR, "sspai_results.txt")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from utils import SEARCH_RESULTS_DIR, ensure_dirs
+
+RESULT_FILE = os.path.join(SEARCH_RESULTS_DIR, "sspai_results.txt")
 
 SEARCH_API = "https://sspai.com/api/v1/search/all/info/get"
 DETAIL_API = "https://sspai.com/api/v1/article/info/get"
@@ -41,8 +43,8 @@ USER_AGENT = (
 DEFAULT_KEYWORDS = ["效率工具", "独立开发", "小工具推荐"]
 
 
-def _ensure_tmp_dir():
-    os.makedirs(TMP_DIR, exist_ok=True)
+def _ensure_output_dir():
+    ensure_dirs()
 
 
 def _request_json(url, referer="https://sspai.com/"):
@@ -254,11 +256,11 @@ def main():
     )
     parser.add_argument(
         "--output", type=str, default=None,
-        help="输出文件路径（默认 tmp/sspai_results.txt）"
+        help="输出文件路径（默认 data/search-results/sspai_results.txt）"
     )
     args = parser.parse_args()
 
-    _ensure_tmp_dir()
+    _ensure_output_dir()
 
     # 模式一：获取文章详情
     if args.detail:
@@ -280,7 +282,7 @@ def main():
             sys.exit(1)
 
         output = "\n\n".join(all_text)
-        detail_file = args.output or os.path.join(TMP_DIR, "sspai_detail.txt")
+        detail_file = args.output or os.path.join(SEARCH_RESULTS_DIR, "sspai_detail.txt")
         with open(detail_file, "w", encoding="utf-8") as f:
             f.write(output)
         print(output)
@@ -327,7 +329,7 @@ def main():
     text = format_as_text(all_articles, keywords)
 
     output_file = args.output or RESULT_FILE
-    _ensure_tmp_dir()
+    _ensure_output_dir()
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(text)
 

@@ -10,7 +10,7 @@ Product Hunt Trending - 通过官方 API v2 获取热门产品
   python3 producthunt_trending.py --days 3 --limit 20
   python3 producthunt_trending.py --topic productivity --days 7
 
-结果自动保存到 tmp/ph_results.txt
+结果自动保存到 .skills-data/idea2mvp/data/search-results/ph_results.txt
 """
 
 import argparse
@@ -22,11 +22,10 @@ import urllib.error
 from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from utils import load_env
+from utils import load_env, SEARCH_RESULTS_DIR, ensure_dirs
 
 API_URL = "https://api.producthunt.com/v2/api/graphql"
-TMP_DIR = os.path.join(os.getcwd(), "tmp")
-RESULT_FILE = os.path.join(TMP_DIR, "ph_results.txt")
+RESULT_FILE = os.path.join(SEARCH_RESULTS_DIR, "ph_results.txt")
 
 GRAPHQL_QUERY = """
 {
@@ -175,7 +174,7 @@ def main():
             "如需配置 Token：\n"
             "  1. 访问 https://www.producthunt.com/v2/oauth/applications\n"
             "  2. 创建应用，获取 Developer Token\n"
-            "  3. 在项目工作目录创建 .env.idea2mvp 文件，写入：PRODUCTHUNT_TOKEN=your_token",
+            "  3. 在 .skills-data/idea2mvp/.env 中写入：PRODUCTHUNT_TOKEN=your_token",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -196,7 +195,7 @@ def main():
         sys.exit(1)
 
     text = format_as_text(posts, date_after, date_before, args.topic)
-    os.makedirs(TMP_DIR, exist_ok=True)
+    ensure_dirs()
     with open(RESULT_FILE, "w", encoding="utf-8") as f:
         f.write(text)
     print(text)

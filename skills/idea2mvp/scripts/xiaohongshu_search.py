@@ -12,7 +12,7 @@
     python3 xiaohongshu_search.py --keyword "宝藏app推荐" --limit 5
 
   从已有 JSON 解析（离线模式，不需要浏览器）：
-    python3 xiaohongshu_search.py --input tmp/xhs_response.json
+    python3 xiaohongshu_search.py --input data/search-results/xhs_response.json
 
 依赖：
   pip install playwright && python -m playwright install chromium
@@ -29,9 +29,11 @@ import sys
 import time
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-TMP_DIR = os.path.join(os.getcwd(), "tmp")
-RESULT_FILE = os.path.join(TMP_DIR, "xhs_results.txt")
-BROWSER_DATA_DIR = os.path.join(TMP_DIR, "xhs_browser_data")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from utils import SEARCH_RESULTS_DIR, CACHE_DIR, ensure_dirs
+
+RESULT_FILE = os.path.join(SEARCH_RESULTS_DIR, "xhs_results.txt")
+BROWSER_DATA_DIR = os.path.join(CACHE_DIR, "xhs_browser_data")
 XHS_HOME = "https://www.xiaohongshu.com"
 
 SORT_MAP = {
@@ -636,7 +638,7 @@ def main():
         sys.exit(1)
 
     text = format_as_text(notes, keyword)
-    os.makedirs(TMP_DIR, exist_ok=True)
+    ensure_dirs()
     with open(RESULT_FILE, "w", encoding="utf-8") as f:
         f.write(text)
     print(text)
