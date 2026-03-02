@@ -28,7 +28,6 @@ description: "Discover product ideas, validate them, and build MVPs. Search tren
         search-results/ — 各平台搜索结果（ph_results.txt、github_results.txt 等）
         idea-brief/      — 灵感确认文档（按时间戳归档）
         user-profile.md、报告等
-    tmp/            — 临时文件（如待发送的 Markdown 报告等）
     cache/          — 可安全删除的缓存（如小红书浏览器登录数据）
     logs/           — 日志文件
 ```
@@ -184,6 +183,6 @@ PROJECT_ROOT=/path/to/project python3 scripts/xxx.py [参数]
 - **`scripts/xiaohongshu_search.py`** — 使用 Playwright 自动化浏览器搜索小红书笔记。模拟真人操作（搜索 → 逐个点入详情页提取完整内容），需首次扫码登录。若用户设置了 `SKIP_XHS_PLAYWRIGHT=true` 则直接跳过小红书搜索（小红书未开放公网搜索，搜索引擎无法抓取）。Playwright 依赖通过 `pip install playwright` 安装。
 - **`scripts/sspai_search.py`** — 通过少数派搜索 API 获取工具/产品相关文章。无需认证。支持单/多关键词搜索，自动去重、按点赞数排序。还支持 `--detail <id>` 获取文章完整正文内容。阶段一搜索中文社区时优先使用。
 - **`scripts/indiehackers_search.py`** — 通过 Indie Hackers 内置的 Algolia 搜索 API 获取独立开发者产品。无需认证。返回产品名称、月收入、领域标签、商业模式等。支持 `--min-revenue` 过滤低收入产品。阶段一搜索英文独立开发者社区时优先使用。
-- **`scripts/send_email.py`** — 通过 SMTP 发送邮件通知。可将搜索报告或任意文本内容发送到指定邮箱。支持从 `--body`、`--file`（多文件合并）或 stdin 传入内容。需在 `.skills-data/idea2mvp/.env` 中配置 `EMAIL_SMTP_HOST`、`EMAIL_SENDER`、`EMAIL_PASSWORD`、`EMAIL_RECEIVER`。仅使用 Python 标准库，无额外依赖。生成的待发送 Markdown 文件应先保存到 `.skills-data/idea2mvp/tmp/` 目录，再通过 `--file` 参数引用发送。
+- **`scripts/send_email.py`** — 通过 SMTP 发送邮件通知。可将搜索报告或任意文本内容发送到指定邮箱。支持从 `--body`、`--file`（多文件合并）或 stdin 传入内容。需在 `.skills-data/idea2mvp/.env` 中配置 `EMAIL_SMTP_HOST`、`EMAIL_SENDER`、`EMAIL_PASSWORD`、`EMAIL_RECEIVER`。仅使用 Python 标准库，无额外依赖。发送前，先将生成的 Markdown 内容保存到 `.skills-data/idea2mvp/cache/` 目录，再通过 `--file` 传入发送。
 - **`scripts/seen_tools.py`** — 已推荐工具的去重记录管理。`read` 子命令返回最近 N 天（默认 90）的历史推荐并自动清理过期条目；`add` 子命令追加新记录。存储格式为 JSON Lines（`.skills-data/idea2mvp/data/seen-tools.jsonl`）。阶段一生成报告前后使用。
 

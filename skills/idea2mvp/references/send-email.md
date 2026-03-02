@@ -37,19 +37,16 @@ cat .skills-data/idea2mvp/data/search-results/ph_results.txt | PROJECT_ROOT=<项
 PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "报告" --body "内容" --to someone@example.com
 ```
 
-## 临时文件目录
+## 邮件内容缓存
 
-当需要发送的内容较长或需要先生成 Markdown 文件再发送时，应将文件保存到 `.skills-data/idea2mvp/tmp/` 目录，然后通过 `--file` 参数引用发送。例如：
+发送前，先将生成的 Markdown 内容保存到 `.skills-data/idea2mvp/cache/` 目录（如 `email_report.md`），再通过 `--file` 参数传入发送。这样做的好处：
+- 发送失败时可重试，无需重新生成内容
+- 保留已发送内容的本地副本，方便回溯
 
 ```bash
-# 1. 先将生成的报告保存为 Markdown 文件
-#    保存路径: .skills-data/idea2mvp/tmp/report.md
-
-# 2. 通过 --file 发送
-PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "工具探索报告" --file .skills-data/idea2mvp/tmp/report.md
+# 示例：先保存到 cache，再发送
+PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "工具探索报告" --file .skills-data/idea2mvp/cache/email_report.md
 ```
-
-> `tmp/` 目录用于存放临时生成的待发送文件，发送完成后可保留或清理。
 
 ## 触发时机
 
