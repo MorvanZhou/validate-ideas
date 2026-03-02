@@ -281,7 +281,7 @@ PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py add --json '[{"name
 - **适合人群**：[目标用户]
 - **平台**：iOS / Android / Web / 桌面 / CLI / 浏览器插件
 - **价格**：免费 / 买断 / 订阅
-- **信息来源**：Product Hunt / GitHub / 少数派 / 小红书
+- **信息来源**：Product Hunt / GitHub / 少数派 / 小红书。同时附上原始搜索结果链接
 
 ---
 
@@ -294,6 +294,7 @@ PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py add --json '[{"name
 - **目标用户**：[用户画像]
 - ⭐ Star 数：[数量]
 - **技术栈**：[主要技术]
+- **项目地址**：[GitHub 链接]
 
 ---
 

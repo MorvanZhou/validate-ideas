@@ -101,7 +101,7 @@ PROJECT_ROOT=/path/to/project python3 scripts/xxx.py [参数]
 - 发现根本性障碍时触发 **Idea 扩展机制**（参考 `references/idea-expansion.md`），不简单否定，而是提出替代方向
 - 用户可在任何阶段决定放弃或转向
 
-**阶段输出**：可行性评估报告（参考 `references/report-template.md`）。
+**阶段输出**：可行性评估报告（参考 `assets/report-template.md`）。
 
 若建议推进，询问用户是否进入阶段三。
 
@@ -173,8 +173,11 @@ PROJECT_ROOT=/path/to/project python3 scripts/xxx.py [参数]
 - **`references/evaluation-framework.md`** — 评估框架：五维度评分标准、盈利模式参考、获客渠道对比、MVP 验证方法论。阶段二评分时使用。
 - **`references/build-mvp.md`** — MVP 实现指南：用户技术背景适配、范围确认、技术方案设计、编码实现流程、分层运行指引、部署方案。阶段三使用。
 - **`references/frontend-design.md`** — 前端设计规范：设计思考流程、字体/色彩/动效/构图/背景的视觉标准、实现原则。阶段三涉及前端界面时使用。
-- **`references/report-template.md`** — 可行性评估报告模板。阶段二最终输出使用。
 - **`references/send-email.md`** — 邮件通知使用指南：配置方式、脚本用法。当用户要求将某些信息通过邮件发送时，按此指南执行。
+
+### assets/
+
+- **`assets/report-template.md`** — 可行性评估报告模板。阶段二最终输出使用。
 
 ### scripts/
 

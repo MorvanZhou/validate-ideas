@@ -163,7 +163,7 @@ site:zhihu.com "有没有" / "推荐" [类别]
 **执行**：
 1. 按 `references/evaluation-framework.md` 的评分标准对五个维度评分
 2. 根据综合评分解读规则给出建议
-3. 按 `references/report-template.md` 生成完整报告
+3. 按 `assets/report-template.md` 生成完整报告
 4. 如果推荐推进，设计最小验证方案
 
 **输出模板**：
