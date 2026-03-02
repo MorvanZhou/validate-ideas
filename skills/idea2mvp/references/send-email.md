@@ -13,14 +13,14 @@
 ### 发送文本内容
 
 ```bash
-python3 scripts/send_email.py --subject "工具探索报告" --body "报告正文..."
+PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "工具探索报告" --body "报告正文..."
 ```
 
 ### 从文件读取内容发送（支持多个文件合并为一封邮件）
 
 ```bash
-python3 scripts/send_email.py --subject "工具探索报告" --file .skills-data/idea2mvp/data/search-results/ph_results.txt
-python3 scripts/send_email.py --subject "全平台报告" --file .skills-data/idea2mvp/data/search-results/ph_results.txt .skills-data/idea2mvp/data/search-results/github_results.txt .skills-data/idea2mvp/data/search-results/v2ex_results.txt
+PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "工具探索报告" --file .skills-data/idea2mvp/data/search-results/ph_results.txt
+PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "全平台报告" --file .skills-data/idea2mvp/data/search-results/ph_results.txt .skills-data/idea2mvp/data/search-results/github_results.txt .skills-data/idea2mvp/data/search-results/v2ex_results.txt
 ```
 
 > **Markdown 自动渲染**：当 `--file` 中包含 `.md` 文件时，脚本会自动将内容转换为 HTML 格式发送，邮件中会以渲染后的富文本形式展示（标题、列表、表格、代码块等）。非 `.md` 文件仍以纯文本发送。
@@ -28,13 +28,13 @@ python3 scripts/send_email.py --subject "全平台报告" --file .skills-data/id
 ### 从 stdin 读取内容
 
 ```bash
-cat .skills-data/idea2mvp/data/search-results/ph_results.txt | python3 scripts/send_email.py --subject "Product Hunt 报告"
+cat .skills-data/idea2mvp/data/search-results/ph_results.txt | PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "Product Hunt 报告"
 ```
 
 ### 指定收件人（覆盖 `.env` 中的默认收件人）
 
 ```bash
-python3 scripts/send_email.py --subject "报告" --body "内容" --to someone@example.com
+PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "报告" --body "内容" --to someone@example.com
 ```
 
 ## 触发时机

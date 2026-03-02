@@ -23,8 +23,10 @@ import os
 
 SKILL_NAME = "idea2mvp"
 
-# 项目根目录（运行脚本时的工作目录）
-PROJECT_ROOT = os.getcwd()
+# 项目根目录：优先从环境变量 PROJECT_ROOT 获取，fallback 到 cwd。
+# agent 执行脚本时应始终传入 PROJECT_ROOT，确保 .skills-data/ 创建在项目根目录下，
+# 而不是 skill 源码目录下。
+PROJECT_ROOT = os.environ.get("PROJECT_ROOT", os.getcwd())
 
 # 运行时数据根目录
 SKILL_DATA_DIR = os.path.join(PROJECT_ROOT, ".skills-data", SKILL_NAME)

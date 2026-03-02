@@ -42,6 +42,16 @@ description: "Discover product ideas, validate them, and build MVPs. Search tren
 
 **Git 忽略**：在 `.gitignore` 中添加 `.skills-data/` 即可忽略所有 skill 运行时数据。
 
+**⚠️ 凭证安全原则**：所有 Token、密码等敏感配置统一存放在 `.skills-data/idea2mvp/.env` 中，由脚本内部调用 `load_env()` 自动读取。**严禁在命令行中内联传递凭证**（如 `TOKEN=xxx python3 scripts/...`），这会导致敏感信息泄露到终端历史和日志中。
+
+**⚠️ 脚本执行规范**：所有 Python 脚本通过环境变量 `PROJECT_ROOT` 确定项目根目录（即 `.skills-data/` 的创建位置）。执行脚本时**必须传入 `PROJECT_ROOT`**，格式为：
+
+```bash
+PROJECT_ROOT=/path/to/project python3 scripts/xxx.py [参数]
+```
+
+> `PROJECT_ROOT` 不是敏感信息，写在命令行中没有安全问题。如果未传入，脚本会 fallback 到 `cwd`，但当 agent 将工作目录切换到 skill 源码目录时会导致 `.skills-data/` 被错误创建在 skill 目录下。因此**必须显式传入**。
+
 ## 三阶段工作流
 
 ### 阶段一：灵感发现（Find Ideas）
@@ -53,10 +63,10 @@ description: "Discover product ideas, validate them, and build MVPs. Search tren
 **核心步骤**：
 1. **确认搜索偏好**：检查 `.skills-data/idea2mvp/.env`，如未配置偏好则询问用户：是否配置 Product Hunt Token 以使用 API 搜索？是否使用 Playwright 控制浏览器搜索小红书？用户选择跳过的数据源会写入 `.skills-data/idea2mvp/.env`（`SKIP_PH_API=true` / `SKIP_XHS_PLAYWRIGHT=true`），后续自动跳过不再询问。注意：小红书未开放公网搜索，跳过 Playwright 时直接跳过小红书搜索，不使用 `web_search` 替代
 2. 并行搜索 Product Hunt、中文社区（小红书/V2EX/少数派）、Indie Hackers、独立开发者社区、GitHub Trending
-3. **跨会话去重**：运行 `python3 scripts/seen_tools.py read` 获取最近 90 天已推荐工具列表，筛选时跳过这些工具
+3. **跨会话去重**：运行 `PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py read` 获取最近 90 天已推荐工具列表，筛选时跳过这些工具
 4. 筛选 5-8 个最有启发性的工具，深度分析痛点和模式
 5. 生成 5 个可拓展的产品 Ideas
-6. 输出完整的工具探索报告，并运行 `python3 scripts/seen_tools.py add` 将本次推荐的工具追加到去重记录
+6. 输出完整的工具探索报告，并运行 `PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py add` 将本次推荐的工具追加到去重记录
 
 **阶段输出**：工具探索报告（含工具推荐 + 产品 Ideas + 趋势洞察）。
 

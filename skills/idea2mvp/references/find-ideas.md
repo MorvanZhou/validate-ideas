@@ -15,9 +15,9 @@
 **执行流程**：
 1. 直接运行脚本（脚本自动从 `.skills-data/idea2mvp/.env` 读取 Token，无需手动 export）
 ```bash
-python3 scripts/producthunt_trending.py
-python3 scripts/producthunt_trending.py --days 7 --limit 20
-python3 scripts/producthunt_trending.py --topic productivity --days 3
+PROJECT_ROOT=<项目根目录> python3 scripts/producthunt_trending.py
+PROJECT_ROOT=<项目根目录> python3 scripts/producthunt_trending.py --days 7 --limit 20
+PROJECT_ROOT=<项目根目录> python3 scripts/producthunt_trending.py --topic productivity --days 3
 ```
 2. **用户不想配置 Token 时**（`.skills-data/idea2mvp/.env` 中 `SKIP_PH_API=true`）：使用 `web_search` 搜索 PH 相关信息
   - `"Product Hunt" best new tools {月份} {年份}`
@@ -42,15 +42,15 @@ python3 scripts/producthunt_trending.py --topic productivity --days 3
 
 1. **Playwright 自动搜索**（推荐，需用户同意使用 Playwright）：
    ```bash
-   python3 scripts/xiaohongshu_search.py --keyword "效率工具推荐"
-   python3 scripts/xiaohongshu_search.py --keyword "AI工具推荐" --sort popularity_descending
-   python3 scripts/xiaohongshu_search.py --keyword "宝藏app推荐" --limit 5
+   PROJECT_ROOT=<项目根目录> python3 scripts/xiaohongshu_search.py --keyword "效率工具推荐"
+   PROJECT_ROOT=<项目根目录> python3 scripts/xiaohongshu_search.py --keyword "AI工具推荐" --sort popularity_descending
+   PROJECT_ROOT=<项目根目录> python3 scripts/xiaohongshu_search.py --keyword "宝藏app推荐" --limit 5
    ```
    首次运行需扫码登录，后续自动复用。脚本逐个点入笔记详情页，提取完整正文内容和互动数据。
 
 2. **从 JSON 解析**（离线模式，已有数据时）：
    ```bash
-   python3 scripts/xiaohongshu_search.py --input .skills-data/idea2mvp/data/search-results/xhs_response.json
+   PROJECT_ROOT=<项目根目录> python3 scripts/xiaohongshu_search.py --input .skills-data/idea2mvp/data/search-results/xhs_response.json
    ```
 
 3. **用户不想使用 Playwright 时**：在 `.skills-data/idea2mvp/.env` 中设置 `SKIP_XHS_PLAYWRIGHT=true`，后续直接跳过小红书搜索（小红书未开放公网搜索，搜索引擎无法抓取其内容，`web_search` 搜不到有效结果）。
@@ -60,11 +60,11 @@ python3 scripts/producthunt_trending.py --topic productivity --days 3
 **V2EX**（✅ 免费公开 API，无需认证）：运行 `scripts/v2ex_topics.py`，从产品相关节点（分享创造、分享发现）获取话题，自动过滤出工具/产品/独立开发相关内容，结果保存到 `.skills-data/idea2mvp/data/search-results/v2ex_results.txt`。
 
 ```bash
-python3 scripts/v2ex_topics.py                          # 默认从 分享创造 + 分享发现 节点获取，自动过滤工具相关话题
-python3 scripts/v2ex_topics.py --nodes create share macos  # 指定多个节点
-python3 scripts/v2ex_topics.py --filter "AI工具"          # 自定义关键词过滤
-python3 scripts/v2ex_topics.py --no-filter                 # 不过滤，返回节点下所有话题
-python3 scripts/v2ex_topics.py --pages 2                   # 每个节点获取 2 页（约 40 条/节点）
+PROJECT_ROOT=<项目根目录> python3 scripts/v2ex_topics.py                          # 默认从 分享创造 + 分享发现 节点获取，自动过滤工具相关话题
+PROJECT_ROOT=<项目根目录> python3 scripts/v2ex_topics.py --nodes create share macos  # 指定多个节点
+PROJECT_ROOT=<项目根目录> python3 scripts/v2ex_topics.py --filter "AI工具"          # 自定义关键词过滤
+PROJECT_ROOT=<项目根目录> python3 scripts/v2ex_topics.py --no-filter                 # 不过滤，返回节点下所有话题
+PROJECT_ROOT=<项目根目录> python3 scripts/v2ex_topics.py --pages 2                   # 每个节点获取 2 页（约 40 条/节点）
 ```
 
 可用节点：`create`（分享创造）、`share`（分享发现）、`macos`、`chrome`、`programmer`（程序员）、`app`（App 推荐）。
@@ -75,14 +75,14 @@ python3 scripts/v2ex_topics.py --pages 2                   # 每个节点获取 
 
 ```bash
 # 搜索文章列表
-python3 scripts/sspai_search.py                                # 默认搜索: 效率工具、独立开发、小工具推荐
-python3 scripts/sspai_search.py --keyword "效率工具"            # 单关键词搜索
-python3 scripts/sspai_search.py --keywords "AI工具" "独立开发"  # 多关键词搜索
-python3 scripts/sspai_search.py --keyword "效率工具" --limit 10 # 限制输出数量
+PROJECT_ROOT=<项目根目录> python3 scripts/sspai_search.py                                # 默认搜索: 效率工具、独立开发、小工具推荐
+PROJECT_ROOT=<项目根目录> python3 scripts/sspai_search.py --keyword "效率工具"            # 单关键词搜索
+PROJECT_ROOT=<项目根目录> python3 scripts/sspai_search.py --keywords "AI工具" "独立开发"  # 多关键词搜索
+PROJECT_ROOT=<项目根目录> python3 scripts/sspai_search.py --keyword "效率工具" --limit 10 # 限制输出数量
 
 # 获取文章完整正文（传入搜索结果中的文章 ID）
-python3 scripts/sspai_search.py --detail 60079                 # 单篇文章详情
-python3 scripts/sspai_search.py --detail 60079 73051 55239     # 多篇文章详情
+PROJECT_ROOT=<项目根目录> python3 scripts/sspai_search.py --detail 60079                 # 单篇文章详情
+PROJECT_ROOT=<项目根目录> python3 scripts/sspai_search.py --detail 60079 73051 55239     # 多篇文章详情
 ```
 
 **推荐用法**：先用关键词搜索获取文章列表 → 从中挑选与产品/工具相关的文章 → 用 `--detail` 获取完整正文深入了解。
@@ -92,11 +92,11 @@ python3 scripts/sspai_search.py --detail 60079 73051 55239     # 多篇文章详
 **Indie Hackers**（✅ 免费 Algolia 搜索 API，无需认证）：运行 `scripts/indiehackers_search.py`，通过 Indie Hackers 内置的 Algolia 搜索 API 获取独立开发者产品信息，自动按月收入排序并去重，结果保存到 `.skills-data/idea2mvp/data/search-results/ih_results.txt`。
 
 ```bash
-python3 scripts/indiehackers_search.py                                    # 默认搜索: productivity tool, AI tool, developer tool, side project
-python3 scripts/indiehackers_search.py --keyword "AI tool"                # 单关键词搜索
-python3 scripts/indiehackers_search.py --keywords "newsletter" "SaaS"     # 多关键词搜索
-python3 scripts/indiehackers_search.py --keyword "productivity" --limit 10 # 限制输出数量
-python3 scripts/indiehackers_search.py --keyword "AI" --min-revenue 100   # 只看月收入 >= $100 的产品
+PROJECT_ROOT=<项目根目录> python3 scripts/indiehackers_search.py                                    # 默认搜索: productivity tool, AI tool, developer tool, side project
+PROJECT_ROOT=<项目根目录> python3 scripts/indiehackers_search.py --keyword "AI tool"                # 单关键词搜索
+PROJECT_ROOT=<项目根目录> python3 scripts/indiehackers_search.py --keywords "newsletter" "SaaS"     # 多关键词搜索
+PROJECT_ROOT=<项目根目录> python3 scripts/indiehackers_search.py --keyword "productivity" --limit 10 # 限制输出数量
+PROJECT_ROOT=<项目根目录> python3 scripts/indiehackers_search.py --keyword "AI" --min-revenue 100   # 只看月收入 >= $100 的产品
 ```
 
 每个产品包含：名称、tagline、描述、月收入、领域标签、商业模式、融资方式、平台、网站链接等。
@@ -110,10 +110,10 @@ python3 scripts/indiehackers_search.py --keyword "AI" --min-revenue 100   # 只�
 **使用脚本**：运行 `scripts/github_trending.py`，结果自动保存到 `.skills-data/idea2mvp/data/search-results/github_results.txt`。
 
 ```bash
-python3 scripts/github_trending.py
-python3 scripts/github_trending.py --days 7 --min-stars 100
-python3 scripts/github_trending.py --lang python --topic cli
-python3 scripts/github_trending.py --days 90 --lang typescript --min-stars 200
+PROJECT_ROOT=<项目根目录> python3 scripts/github_trending.py
+PROJECT_ROOT=<项目根目录> python3 scripts/github_trending.py --days 7 --min-stars 100
+PROJECT_ROOT=<项目根目录> python3 scripts/github_trending.py --lang python --topic cli
+PROJECT_ROOT=<项目根目录> python3 scripts/github_trending.py --days 90 --lang typescript --min-stars 200
 ```
 
 无需 Token，如需更高速率可在 `.skills-data/idea2mvp/.env` 中配置 `GITHUB_TOKEN`。
@@ -230,7 +230,7 @@ python3 scripts/github_trending.py --days 90 --lang typescript --min-stars 200
 
 **生成报告前**：
 
-1. **去重**：运行 `python3 scripts/seen_tools.py read` 获取历次报告中已推荐过的工具/产品名称列表（默认保留最近 90 天，自动清理过期记录）。在后续筛选中跳过这些已推荐过的工具，确保报告只呈现新发现的内容。如果某个工具在新一轮搜索中有**重大更新**（如新版本、转型、被收购等），可以再次纳入并注明"更新推荐"。
+1. **去重**：运行 `PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py read` 获取历次报告中已推荐过的工具/产品名称列表（默认保留最近 90 天，自动清理过期记录）。在后续筛选中跳过这些已推荐过的工具，确保报告只呈现新发现的内容。如果某个工具在新一轮搜索中有**重大更新**（如新版本、转型、被收购等），可以再次纳入并注明"更新推荐"。
 
 2. **加载搜索结果**：通过 `read_file` 加载 `.skills-data/idea2mvp/data/search-results/` 目录下的搜索结果文件，作为归纳总结的参考素材：
 
@@ -247,13 +247,13 @@ python3 scripts/github_trending.py --days 90 --lang typescript --min-stars 200
 **报告输出后**：运行脚本将本次推荐的工具追加到去重记录：
 
 ```bash
-python3 scripts/seen_tools.py add --tools "ToolName1|一句话定位" "ToolName2|一句话定位"
+PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py add --tools "ToolName1|一句话定位" "ToolName2|一句话定位"
 ```
 
 也支持 JSON 格式批量写入：
 
 ```bash
-python3 scripts/seen_tools.py add --json '[{"name":"ToolA","desc":"描述"},{"name":"ToolB","desc":"描述"}]'
+PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py add --json '[{"name":"ToolA","desc":"描述"},{"name":"ToolB","desc":"描述"}]'
 ```
 
 记录存储在 `.skills-data/idea2mvp/data/seen-tools.jsonl`，读取时自动清理超过 90 天的过期条目，文件不会无限膨胀。

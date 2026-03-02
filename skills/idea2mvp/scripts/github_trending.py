@@ -24,7 +24,7 @@ import urllib.error
 from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from utils import SEARCH_RESULTS_DIR, ensure_dirs
+from utils import SEARCH_RESULTS_DIR, ensure_dirs, load_env
 
 API_URL = "https://api.github.com/search/repositories"
 
@@ -118,6 +118,7 @@ def main():
     parser.add_argument("--limit", type=int, default=20, help="最多展示数量 (default: 20)")
     args = parser.parse_args()
 
+    load_env()
     token = os.environ.get("GITHUB_TOKEN")
     query = build_query(days=args.days, min_stars=args.min_stars, language=args.lang,
                         topic=args.topic, keywords=args.keywords)
