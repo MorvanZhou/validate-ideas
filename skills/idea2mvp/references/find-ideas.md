@@ -132,6 +132,16 @@ PROJECT_ROOT=<项目根目录> python3 scripts/github_trending.py --days 90 --la
 
 > 所有脚本都会自动将结果保存为纯文本到 `.skills-data/idea2mvp/data/search-results/` 目录，可通过 `read_file` 读取纯文本结果，节省 token。
 
+**前置步骤：了解用户背景**
+
+在开始搜索前，先检查并读取 `.skills-data/idea2mvp/data/user-profile.md`（如存在）。根据用户的行业经验、技术背景、产品偏好等信息，针对性地调整搜索关键词和搜索范围。例如：
+- 用户是设计师 → 增加设计工具类关键词，侧重 Product Hunt 的 `design-tools` topic
+- 用户有 Python 经验 → GitHub 搜索侧重 Python 项目，关注 CLI 工具
+- 用户关注 AI 领域 → 各平台搜索都加入 AI 相关关键词
+- 用户偏好 C 端轻量工具 → 筛选时加重小工具、效率工具权重
+
+如果 `user-profile.md` 不存在或信息不足，按默认关键词执行即可，在后续对话中自然积累用户画像。
+
 **第零步：确认用户搜索偏好**
 
 在执行搜索前，先读取 `.skills-data/idea2mvp/.env` 检查是否已有偏好配置。如果以下配置项**不存在**，则向用户确认：

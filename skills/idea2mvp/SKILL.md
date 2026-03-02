@@ -61,12 +61,13 @@ PROJECT_ROOT=/path/to/project python3 scripts/xxx.py [参数]
 **执行**：读取 `references/find-ideas.md`，按照其中的搜索策略、筛选标准、Idea 扩展方法和报告模板执行。在与用户讨论的过程中，留意用户透露的行业背景、产品偏好、技术经验等信息，记录到 `.skills-data/idea2mvp/data/user-profile.md`。
 
 **核心步骤**：
-1. **确认搜索偏好**：检查 `.skills-data/idea2mvp/.env`，如未配置偏好则询问用户：是否配置 Product Hunt Token 以使用 API 搜索？是否使用 Playwright 控制浏览器搜索小红书？用户选择跳过的数据源会写入 `.skills-data/idea2mvp/.env`（`SKIP_PH_API=true` / `SKIP_XHS_PLAYWRIGHT=true`），后续自动跳过不再询问。注意：小红书未开放公网搜索，跳过 Playwright 时直接跳过小红书搜索，不使用 `web_search` 替代
-2. 并行搜索 Product Hunt、中文社区（小红书/V2EX/少数派）、Indie Hackers、独立开发者社区、GitHub Trending
-3. **跨会话去重**：运行 `PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py read` 获取最近 90 天已推荐工具列表，筛选时跳过这些工具
-4. 筛选 5-8 个最有启发性的工具，深度分析痛点和模式
-5. 生成 5 个可拓展的产品 Ideas
-6. 输出完整的工具探索报告，并运行 `PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py add` 将本次推荐的工具追加到去重记录
+1. **了解用户背景**：先读取 `.skills-data/idea2mvp/data/user-profile.md`（如存在），根据用户的行业经验、技术背景、产品偏好等针对性调整搜索关键词和搜索范围。如不存在则按默认关键词执行
+2. **确认搜索偏好**：检查 `.skills-data/idea2mvp/.env`，如未配置偏好则询问用户：是否配置 Product Hunt Token 以使用 API 搜索？是否使用 Playwright 控制浏览器搜索小红书？用户选择跳过的数据源会写入 `.skills-data/idea2mvp/.env`（`SKIP_PH_API=true` / `SKIP_XHS_PLAYWRIGHT=true`），后续自动跳过不再询问。注意：小红书未开放公网搜索，跳过 Playwright 时直接跳过小红书搜索，不使用 `web_search` 替代
+3. 并行搜索 Product Hunt、中文社区（小红书/V2EX/少数派）、Indie Hackers、独立开发者社区、GitHub Trending
+4. **跨会话去重**：运行 `PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py read` 获取最近 90 天已推荐工具列表，筛选时跳过这些工具
+5. 筛选 5-8 个最有启发性的工具，深度分析痛点和模式
+6. 生成 5 个可拓展的产品 Ideas
+7. 输出完整的工具探索报告，并运行 `PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py add` 将本次推荐的工具追加到去重记录
 
 **阶段输出**：工具探索报告（含工具推荐 + 产品 Ideas + 趋势洞察）。
 
@@ -84,7 +85,7 @@ PROJECT_ROOT=/path/to/project python3 scripts/xxx.py [参数]
 
 **目标**：通过结构化的多步骤流程验证想法的可行性，以交互式咨询的方式逐步推进。
 
-**执行**：读取 `references/validate-ideas.md`，按照其中的七步验证流程执行，每个环节都需要和用户确认信息，让用户参与评价和决策。评分时参考 `references/evaluation-framework.md`。沟通过程中持续将用户表现出的认知水平、行业见解、技术倾向等信息更新到 `.skills-data/idea2mvp/data/user-profile.md`。
+**执行**：**先读取 `.skills-data/idea2mvp/data/user-profile.md`**（如存在），了解用户的行业背景、技术经验和认知水平，据此调整沟通深度和验证侧重点。然后读取 `references/validate-ideas.md`，按照其中的七步验证流程执行，每个环节都需要和用户确认信息，让用户参与评价和决策。评分时参考 `references/evaluation-framework.md`。沟通过程中持续将用户表现出的认知水平、行业见解、技术倾向等信息更新到 `.skills-data/idea2mvp/data/user-profile.md`。
 
 **七步流程概览**：
 1. **想法澄清** — 通过反向提问帮用户厘清产品概念
