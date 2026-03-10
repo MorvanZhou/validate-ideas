@@ -37,6 +37,21 @@ cat .skills-data/idea2mvp/data/search-results/ph_results.txt | PROJECT_ROOT=<项
 PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "报告" --body "内容" --to someone@example.com
 ```
 
+### 添加附件（支持多个附件）
+
+```bash
+# 正文 + 单个附件
+PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "可行性报告" --body "请查看附件中的完整报告" --attachment .skills-data/idea2mvp/cache/report.pdf
+
+# 正文 + 多个附件
+PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "产品调研资料" --body "附件包含报告和数据" --attachment .skills-data/idea2mvp/cache/report.pdf .skills-data/idea2mvp/cache/data.csv
+
+# Markdown 正文 + 附件（正文渲染为 HTML，附件作为文件附带）
+PROJECT_ROOT=<项目根目录> python3 scripts/send_email.py --subject "工具探索报告" --file .skills-data/idea2mvp/cache/email_report.md --attachment .skills-data/idea2mvp/cache/detailed_data.xlsx
+```
+
+> 附件支持任意文件类型（PDF、图片、Excel、CSV、压缩包等），脚本会自动识别 MIME 类型。不存在的附件文件会被跳过并输出警告。
+
 ## 邮件内容缓存
 
 发送前，先将生成的 Markdown 内容保存到 `.skills-data/idea2mvp/cache/` 目录（如 `email_report.md`），再通过 `--file` 参数传入发送。这样做的好处：

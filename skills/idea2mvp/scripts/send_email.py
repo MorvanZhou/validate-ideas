@@ -28,17 +28,24 @@
   # 指定收件人（覆盖 .env 中的默认收件人）
   python3 send_email.py --subject "报告" --body "内容" --to someone@example.com
 
+  # 添加附件（支持多个附件）
+  python3 send_email.py --subject "报告" --body "请查看附件" --attachment report.pdf data.csv
+  python3 send_email.py --subject "报告" --file report.md --attachment report.pdf
+
 结果输出到 stdout，确认发送成功或失败。
 """
 
 import argparse
 import html
+import mimetypes
 import os
 import re
 import smtplib
 import sys
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from utils import load_env
@@ -216,7 +223,7 @@ def md_to_html(text):
 </body></html>"""
 
 
-def send_email(subject, body, receiver=None, is_html=False):
+def send_email(subject, body, receiver=None, is_html=False, attachments=None):
     """通过 SMTP 发送邮件。
 
     Args:
@@ -224,6 +231,7 @@ def send_email(subject, body, receiver=None, is_html=False):
         body: 邮件正文（纯文本或 HTML）
         receiver: 收件人邮箱，为 None 时使用 .env 中的 EMAIL_RECEIVER
         is_html: 是否为 HTML 格式
+        attachments: 附件文件路径列表，为 None 时不添加附件
 
     Returns:
         True 成功，False 失败
@@ -254,6 +262,24 @@ def send_email(subject, body, receiver=None, is_html=False):
     msg["Subject"] = subject
     msg.attach(MIMEText(body, "html" if is_html else "plain", "utf-8"))
 
+    if attachments:
+        for filepath in attachments:
+            if not os.path.exists(filepath):
+                print(f"⚠️ 附件不存在，跳过：{filepath}", flush=True)
+                continue
+            mime_type, _ = mimetypes.guess_type(filepath)
+            if mime_type is None:
+                mime_type = "application/octet-stream"
+            main_type, sub_type = mime_type.split("/", 1)
+            with open(filepath, "rb") as f:
+                part = MIMEBase(main_type, sub_type)
+                part.set_payload(f.read())
+            encoders.encode_base64(part)
+            filename = os.path.basename(filepath)
+            part.add_header("Content-Disposition", "attachment", filename=filename)
+            msg.attach(part)
+            print(f"📎 已添加附件：{filename}", flush=True)
+
     try:
         if port == 465:
             server = smtplib.SMTP_SSL(host, port, timeout=15)
@@ -281,6 +307,7 @@ def main():
     parser.add_argument("--subject", "-s", required=True, help="邮件主题")
     parser.add_argument("--body", "-b", help="邮件正文（纯文本）")
     parser.add_argument("--file", "-f", nargs="+", help="从文件读取正文内容（支持多个文件，合并发送）")
+    parser.add_argument("--attachment", "-a", nargs="+", help="附件文件路径（支持多个附件）")
     parser.add_argument("--to", help="收件人邮箱（覆盖 .env 中的 EMAIL_RECEIVER）")
     args = parser.parse_args()
 
@@ -320,7 +347,7 @@ def main():
         body = md_to_html(body)
         print("📝 检测到 Markdown 文件，已转换为 HTML 格式发送", flush=True)
 
-    success = send_email(args.subject, body, receiver=args.to, is_html=has_markdown)
+    success = send_email(args.subject, body, receiver=args.to, is_html=has_markdown, attachments=args.attachment)
     sys.exit(0 if success else 1)
 
 
