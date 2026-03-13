@@ -63,7 +63,7 @@ PROJECT_ROOT=/path/to/project python3 scripts/xxx.py [参数]
 **核心步骤**：
 1. **了解用户背景**：先读取 `.skills-data/idea2mvp/data/user-profile.md`（如存在），根据用户的行业经验、技术背景、产品偏好等针对性调整搜索关键词和搜索范围。如不存在则按默认关键词执行
 2. **确认搜索偏好**：检查 `.skills-data/idea2mvp/.env`，如未配置偏好则询问用户：是否配置 Product Hunt Token 以使用 API 搜索？是否使用 Playwright 控制浏览器搜索小红书？用户选择跳过的数据源会写入 `.skills-data/idea2mvp/.env`（`SKIP_PH_API=true` / `SKIP_XHS_PLAYWRIGHT=true`），后续自动跳过不再询问。注意：小红书未开放公网搜索，跳过 Playwright 时直接跳过小红书搜索，不使用 `web_search` 替代
-3. 并行搜索 Product Hunt、中文社区（小红书/V2EX/少数派）、Indie Hackers、独立开发者社区、GitHub Trending
+3. 并行搜索 Product Hunt、中文社区（小红书/V2EX/少数派/微信公众号）、Indie Hackers、独立开发者社区、GitHub Trending
 4. **跨会话去重**：运行 `PROJECT_ROOT=<项目根目录> python3 scripts/seen_tools.py read` 获取最近 90 天已推荐工具列表，筛选时跳过这些工具
 5. 筛选 5-8 个最有启发性的工具，深度分析痛点和模式
 6. 生成 5 个可拓展的产品 Ideas
@@ -188,5 +188,6 @@ PROJECT_ROOT=/path/to/project python3 scripts/xxx.py [参数]
 - **`scripts/sspai_search.py`** — 通过少数派搜索 API 获取工具/产品相关文章。无需认证。支持单/多关键词搜索，自动去重、按点赞数排序。还支持 `--detail <id>` 获取文章完整正文内容。阶段一搜索中文社区时优先使用。
 - **`scripts/indiehackers_search.py`** — 通过 Indie Hackers 内置的 Algolia 搜索 API 获取独立开发者产品。无需认证。返回产品名称、月收入、领域标签、商业模式等。支持 `--min-revenue` 过滤低收入产品。阶段一搜索英文独立开发者社区时优先使用。
 - **`scripts/send_email.py`** — 通过 SMTP 发送邮件通知。可将搜索报告或任意文本内容发送到指定邮箱。支持从 `--body`、`--file`（多文件合并）或 stdin 传入内容。需在 `.skills-data/idea2mvp/.env` 中配置 `EMAIL_SMTP_HOST`、`EMAIL_SENDER`、`EMAIL_PASSWORD`、`EMAIL_RECEIVER`。仅使用 Python 标准库，无额外依赖。发送前，先将生成的 Markdown 内容保存到 `.skills-data/idea2mvp/cache/` 目录，再通过 `--file` 传入发送。
+- **`scripts/search_wechat.py`** — 通过搜狗微信搜索获取微信公众号文章。无需认证，仅使用 Python 标准库。支持单/多关键词搜索，自动去重。可通过 `--resolve-url` 解析真实微信文章 URL。搜狗有反爬机制，遇验证码时稍后重试即可。阶段一搜索中文社区时使用。
 - **`scripts/seen_tools.py`** — 已推荐工具的去重记录管理。`read` 子命令返回最近 N 天（默认 90）的历史推荐并自动清理过期条目；`add` 子命令追加新记录。存储格式为 JSON Lines（`.skills-data/idea2mvp/data/seen-tools.jsonl`）。阶段一生成报告前后使用。
 

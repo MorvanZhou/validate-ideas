@@ -57,6 +57,21 @@ PROJECT_ROOT=<项目根目录> python3 scripts/producthunt_trending.py --topic p
 
 **推荐关键词**：`效率工具推荐`、`好用的小众app`、`独立开发者 产品推荐`、`宝藏app推荐`、`AI工具推荐`
 
+**微信公众号**（✅ 通过搜狗微信搜索，无需认证）：运行 `scripts/search_wechat.py`，通过搜狗微信搜索（weixin.sogou.com）获取公众号文章，自动按关键词搜索并去重，结果保存到 `.skills-data/idea2mvp/data/search-results/wechat_results.txt`。
+
+```bash
+# 搜索文章列表
+PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py                                    # 默认搜索: 效率工具推荐、独立开发 产品、AI工具 推荐
+PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py --keyword "效率工具推荐"            # 单关键词搜索
+PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py --keywords "AI工具" "独立开发"      # 多关键词搜索
+PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py --keyword "效率工具" --limit 20     # 限制每个关键词的结果数量
+PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py --keyword "AI产品" --resolve-url    # 解析真实微信文章URL（较慢）
+```
+
+仅使用 Python 标准库，无需额外依赖。搜狗微信有反爬机制，如遇验证码导致搜索失败，稍后重试即可。
+
+**推荐关键词**：`效率工具推荐`、`独立开发 产品`、`AI工具 推荐`、`小工具 推荐`、`宝藏app 推荐`
+
 **V2EX**（✅ 免费公开 API，无需认证）：运行 `scripts/v2ex_topics.py`，从产品相关节点（分享创造、分享发现）获取话题，自动过滤出工具/产品/独立开发相关内容，结果保存到 `.skills-data/idea2mvp/data/search-results/v2ex_results.txt`。
 
 ```bash
@@ -156,14 +171,15 @@ PROJECT_ROOT=<项目根目录> python3 scripts/github_trending.py --days 90 --la
 
 > 偏好一旦写入 `.skills-data/idea2mvp/.env`，后续搜索自动跳过确认步骤，直接按偏好执行。用户可随时手动修改配置来调整偏好。
 
-**第一轮（并行 5-6 个搜索）**：
+**第一轮（并行 6-8 个搜索）**：
 1. Product Hunt 精选产品（`scripts/producthunt_trending.py`，或 `web_search` 如设置了 `SKIP_PH_API=true`） → `.skills-data/idea2mvp/data/search-results/ph_results.txt`
 2. V2EX 热门/最新话题（`scripts/v2ex_topics.py`） → `.skills-data/idea2mvp/data/search-results/v2ex_results.txt`
 3. GitHub 工具项目（`scripts/github_trending.py`） → `.skills-data/idea2mvp/data/search-results/github_results.txt`
 4. 小红书热门工具推荐（`scripts/xiaohongshu_search.py`，如设置了 `SKIP_XHS_PLAYWRIGHT=true` 则跳过） → `.skills-data/idea2mvp/data/search-results/xhs_results.txt`
 5. 少数派（`scripts/sspai_search.py`）→ `.skills-data/idea2mvp/data/search-results/sspai_results.txt`
 6. Indie Hackers（`scripts/indiehackers_search.py`）→ `.skills-data/idea2mvp/data/search-results/ih_results.txt`
-7. 其他独立开发者社区/英文社区（`web_search`）
+7. 微信公众号（`scripts/search_wechat.py`）→ `.skills-data/idea2mvp/data/search-results/wechat_results.txt`
+8. 其他独立开发者社区/英文社区（`web_search`）
 
 **第二轮（根据第一轮结果补充，并行 2-3 个搜索）**：
 - 针对第一轮发现的有趣方向深入搜索
@@ -251,6 +267,7 @@ PROJECT_ROOT=<项目根目录> python3 scripts/github_trending.py --days 90 --la
 - `.skills-data/idea2mvp/data/search-results/sspai_results.txt` — 少数派文章
 - `.skills-data/idea2mvp/data/search-results/sspai_detail.txt` — 少数派文章详情（如有）
 - `.skills-data/idea2mvp/data/search-results/ih_results.txt` — Indie Hackers 产品
+- `.skills-data/idea2mvp/data/search-results/wechat_results.txt` — 微信公众号文章
 
 > 只加载实际存在的文件。基于这些原始数据进行筛选、交叉比对和归纳，确保报告中的推荐和洞察有据可依。
 
