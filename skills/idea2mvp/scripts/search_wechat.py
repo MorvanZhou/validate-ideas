@@ -3,16 +3,22 @@
 微信公众号文章搜索工具
 
 通过搜狗微信搜索（weixin.sogou.com）获取微信公众号文章。
-仅使用 Python 标准库，无需额外依赖。
+支持 --fetch-content 使用 Playwright 无头浏览器抓取文章正文。
 
 Usage:
     python3 search_wechat.py --keyword "效率工具"
     python3 search_wechat.py --keyword "AI工具推荐" --limit 20
     python3 search_wechat.py --keyword "独立开发" --resolve-url
+    python3 search_wechat.py --keyword "独立开发" --resolve-url --fetch-content
     python3 search_wechat.py --keywords "效率工具" "AI产品" --limit 10
+    python3 search_wechat.py --fetch-content --url "https://mp.weixin.qq.com/s/xxx"
+
+依赖（仅 --fetch-content 需要）：
+    pip install playwright && python -m playwright install chromium
 """
 
 import argparse
+import asyncio
 import gzip
 import html
 import html.parser
@@ -415,15 +421,225 @@ def resolve_real_urls(articles):
     return articles
 
 
+# ── Playwright 文章正文抓取 ───────────────────────────────────
+
+WECHAT_STEALTH_JS = """
+Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+delete navigator.__proto__.webdriver;
+Object.defineProperty(navigator, 'plugins', {
+    get: () => {
+        const p = [
+            { name: 'Chrome PDF Plugin', filename: 'internal-pdf-viewer', description: 'Portable Document Format' },
+            { name: 'Chrome PDF Viewer', filename: 'mhjfbmdgcfjbbpaeojofohoefgiehjai', description: '' },
+            { name: 'Native Client', filename: 'internal-nacl-plugin', description: '' },
+        ];
+        p.length = 3;
+        return p;
+    }
+});
+Object.defineProperty(navigator, 'languages', { get: () => ['zh-CN', 'zh', 'en-US', 'en'] });
+Object.defineProperty(navigator, 'language', { get: () => 'zh-CN' });
+Object.defineProperty(navigator, 'platform', { get: () => 'MacIntel' });
+"""
+
+
+async def _launch_wechat_browser():
+    """启动用于抓取微信文章的 Playwright 浏览器实例。"""
+    from playwright.async_api import async_playwright
+
+    pw = await async_playwright().start()
+    browser = await pw.chromium.launch(
+        headless=True,
+        args=[
+            "--disable-blink-features=AutomationControlled",
+            "--disable-features=IsolateOrigins,site-per-process",
+        ],
+    )
+    context = await browser.new_context(
+        viewport={"width": 1280, "height": 900},
+        locale="zh-CN",
+        timezone_id="Asia/Shanghai",
+        user_agent=(
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/131.0.0.0 Safari/537.36"
+        ),
+    )
+    await context.add_init_script(WECHAT_STEALTH_JS)
+    return pw, browser, context
+
+
+async def _extract_article_from_page(page):
+    """从已加载的微信文章页面中提取标题、作者、发布时间和正文。"""
+    title = await page.evaluate("""
+        () => {
+            const el = document.getElementById('activity-name')
+                || document.querySelector('.rich_media_title');
+            return el ? el.innerText.trim() : '';
+        }
+    """)
+    author = await page.evaluate("""
+        () => {
+            const el = document.getElementById('js_author_name')
+                || document.getElementById('js_name')
+                || document.querySelector('.rich_media_meta_text');
+            return el ? el.innerText.trim() : '';
+        }
+    """)
+    publish_time = await page.evaluate("""
+        () => {
+            const el = document.getElementById('publish_time');
+            return el ? el.innerText.trim() : '';
+        }
+    """)
+    content = await page.evaluate("""
+        () => {
+            const el = document.getElementById('js_content');
+            if (!el) return '';
+            const clone = el.cloneNode(true);
+            clone.querySelectorAll('script, style, noscript').forEach(n => n.remove());
+            return clone.innerText.trim();
+        }
+    """)
+    return title, author, publish_time, content
+
+
+async def _fetch_single_article(context, url, timeout_ms=30000):
+    """用已有的浏览器 context 抓取单篇微信文章正文。
+
+    Args:
+        url: mp.weixin.qq.com 文章直链
+    """
+    page = await context.new_page()
+    try:
+        await page.route(
+            re.compile(r"\.(png|jpg|jpeg|gif|svg|mp4|webm|ico|woff2?)(\?|$)", re.I),
+            lambda route: route.abort(),
+        )
+
+        await page.goto(url, wait_until="networkidle", timeout=timeout_ms)
+
+        try:
+            await page.wait_for_selector("#js_content", state="visible", timeout=8000)
+        except Exception:
+            pass
+
+        title, author, publish_time, content = await _extract_article_from_page(page)
+
+        if not content:
+            return {"error": "正文区域为空（可能文章已删除或需要付费阅读）"}
+
+        content = re.sub(r"\n{3,}", "\n\n", content)
+
+        return {
+            "title": title,
+            "author": author,
+            "publish_time": publish_time,
+            "content": content,
+        }
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        await page.close()
+
+
+async def _fetch_article_content_async(url, timeout_ms=30000):
+    """用 Playwright 无头浏览器抓取单篇微信文章的正文。
+
+    Args:
+        url: 微信文章 URL（mp.weixin.qq.com）或搜狗跳转链接
+
+    Returns:
+        dict: {"title", "author", "publish_time", "content"} 或包含 "error" 的 dict
+    """
+    from playwright.async_api import async_playwright
+
+    pw, browser, context = await _launch_wechat_browser()
+    try:
+        return await _fetch_single_article(context, url, timeout_ms)
+    finally:
+        await context.close()
+        await browser.close()
+        await pw.stop()
+
+
+def fetch_article_content(url, timeout_ms=30000):
+    """同步包装：用 Playwright 抓取单篇微信文章正文。"""
+    return asyncio.run(_fetch_article_content_async(url, timeout_ms))
+
+
+async def _fetch_articles_content_async(articles, delay_range=(2.0, 5.0)):
+    """批量抓取文章正文。复用同一个浏览器实例，减少开销。
+
+    仅处理 URL 已解析为 mp.weixin.qq.com 的文章。
+    """
+    targets = [
+        a for a in articles
+        if a.get("url_resolved") and "mp.weixin.qq.com" in a.get("url", "")
+    ]
+
+    if not targets:
+        print("  ⚠️ 没有已解析的微信文章URL可供抓取正文", file=sys.stderr, flush=True)
+        return articles
+
+    print(
+        f"  开始抓取 {len(targets)} 篇文章正文（Playwright 无头浏览器）...",
+        file=sys.stderr, flush=True,
+    )
+
+    pw, browser, context = await _launch_wechat_browser()
+    try:
+        success = 0
+        for i, art in enumerate(targets):
+            title_short = art["title"][:30]
+            print(f"  [{i+1}/{len(targets)}] {title_short}...", file=sys.stderr, flush=True)
+
+            result = await _fetch_single_article(context, art["url"])
+            if "error" in result:
+                print(f"    ⚠️ 抓取失败: {result['error']}", file=sys.stderr, flush=True)
+                art["content"] = ""
+            else:
+                art["content"] = result.get("content", "")
+                if result.get("author"):
+                    art["author"] = result["author"]
+                if result.get("publish_time"):
+                    art["publish_time"] = result["publish_time"]
+                content_len = len(art["content"])
+                print(f"    ✅ 正文 {content_len} 字符", file=sys.stderr, flush=True)
+                success += 1
+
+            if i < len(targets) - 1:
+                delay = random.uniform(*delay_range)
+                await asyncio.sleep(delay)
+
+        print(
+            f"  正文抓取完成: 成功 {success}, 失败 {len(targets) - success}",
+            file=sys.stderr, flush=True,
+        )
+    finally:
+        await context.close()
+        await browser.close()
+        await pw.stop()
+
+    return articles
+
+
+def fetch_articles_content(articles, delay_range=(2.0, 5.0)):
+    """同步包装：批量抓取文章正文。"""
+    return asyncio.run(_fetch_articles_content_async(articles, delay_range))
+
+
 # ── 搜索主流程 ───────────────────────────────────────────────
 
-def search_wechat(keyword, max_results=10, resolve_url=False):
+def search_wechat(keyword, max_results=10, resolve_url=False, fetch_content=False):
     """搜索微信公众号文章。
 
     Args:
         keyword: 搜索关键词
         max_results: 最大返回数（上限 50）
         resolve_url: 是否解析真实微信文章 URL
+        fetch_content: 是否用 Playwright 抓取文章正文
+                       （Playwright 自动跟随重定向，无需先 resolve_url）
 
     Returns:
         list[dict]: 文章列表
@@ -459,8 +675,13 @@ def search_wechat(keyword, max_results=10, resolve_url=False):
             break
 
     result = articles[:max_results]
-    if resolve_url and result:
+
+    if fetch_content and result:
         result = resolve_real_urls(result)
+        result = fetch_articles_content(result)
+    elif resolve_url and result:
+        result = resolve_real_urls(result)
+
     return result
 
 
@@ -486,6 +707,7 @@ def format_as_text(all_articles, keywords_used):
         title = a.get("title", "(无标题)")
         source = a.get("source", "")
         summary = a.get("summary", "")
+        content = a.get("content", "")
         dt = a.get("datetime", "")
         desc = a.get("date_description", "")
         url = a.get("url", "")
@@ -494,13 +716,21 @@ def format_as_text(all_articles, keywords_used):
         meta_parts = []
         if source:
             meta_parts.append(f"公众号: {source}")
-        if dt:
+        if a.get("author"):
+            meta_parts.append(f"作者: {a['author']}")
+        if a.get("publish_time"):
+            meta_parts.append(f"发布时间: {a['publish_time']}")
+        elif dt:
             meta_parts.append(f"日期: {dt}")
         if desc:
             meta_parts.append(f"({desc})")
         if meta_parts:
             lines.append(f"  {'  '.join(meta_parts)}")
-        if summary:
+        if content:
+            lines.append(f"  --- 正文 ({len(content)} 字) ---")
+            lines.append(f"  {content}")
+            lines.append(f"  --- 正文结束 ---")
+        elif summary:
             if len(summary) > 200:
                 summary = summary[:200] + "..."
             lines.append(f"  {summary}")
@@ -520,10 +750,37 @@ def main():
     parser.add_argument("--keywords", nargs="+", default=None, help="多个搜索关键词")
     parser.add_argument("--limit", type=int, default=10, help="每个关键词的最大结果数（默认 10，上限 50）")
     parser.add_argument("--resolve-url", action="store_true", help="解析真实微信文章 URL（会额外请求，较慢）")
+    parser.add_argument("--fetch-content", action="store_true", help="用 Playwright 抓取文章正文（需安装 playwright）")
+    parser.add_argument("--url", type=str, default=None, help="直接抓取单篇微信文章正文（需 mp.weixin.qq.com URL）")
     parser.add_argument("--output", type=str, default=None, help="输出文件路径")
     args = parser.parse_args()
 
     ensure_dirs()
+
+    # 直接抓取单篇文章模式
+    if args.url:
+        if "mp.weixin.qq.com" not in args.url:
+            print("❌ --url 需要 mp.weixin.qq.com 的文章链接", file=sys.stderr)
+            sys.exit(1)
+        print(f"📖 抓取文章正文: {args.url[:80]}...", file=sys.stderr, flush=True)
+        result = fetch_article_content(args.url)
+        if "error" in result:
+            print(f"❌ 抓取失败: {result['error']}", file=sys.stderr)
+            sys.exit(1)
+        output = (
+            f"标题: {result['title']}\n"
+            f"作者: {result['author']}\n"
+            f"发布时间: {result['publish_time']}\n"
+            f"正文长度: {len(result['content'])} 字\n"
+            f"{'=' * 60}\n"
+            f"{result['content']}\n"
+        )
+        print(output)
+        if args.output:
+            with open(args.output, "w", encoding="utf-8") as f:
+                f.write(output)
+            print(f"\n📄 结果已保存到 {args.output}", file=sys.stderr)
+        return
 
     if args.keyword:
         keywords = [args.keyword]
@@ -535,7 +792,12 @@ def main():
     all_articles = []
     for kw in keywords:
         print(f"🔍 搜索微信公众号: {kw}...", file=sys.stderr, flush=True)
-        arts = search_wechat(kw, max_results=args.limit, resolve_url=args.resolve_url)
+        arts = search_wechat(
+            kw,
+            max_results=args.limit,
+            resolve_url=args.resolve_url,
+            fetch_content=args.fetch_content,
+        )
         print(f"  → 获取 {len(arts)} 篇文章", file=sys.stderr, flush=True)
         all_articles.extend(arts)
         if len(keywords) > 1:

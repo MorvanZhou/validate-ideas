@@ -57,18 +57,30 @@ PROJECT_ROOT=<项目根目录> python3 scripts/producthunt_trending.py --topic p
 
 **推荐关键词**：`效率工具推荐`、`好用的小众app`、`独立开发者 产品推荐`、`宝藏app推荐`、`AI工具推荐`
 
-**微信公众号**（✅ 通过搜狗微信搜索，无需认证）：运行 `scripts/search_wechat.py`，通过搜狗微信搜索（weixin.sogou.com）获取公众号文章，自动按关键词搜索并去重，结果保存到 `.skills-data/idea2mvp/data/search-results/wechat_results.txt`。
+**微信公众号**（✅ 通过搜狗微信搜索，无需认证）：运行 `scripts/search_wechat.py`，通过搜狗微信搜索（weixin.sogou.com）获取公众号文章，自动按关键词搜索并去重，结果保存到 `.skills-data/idea2mvp/data/search-results/wechat_results.txt`。支持用 Playwright 无头浏览器抓取文章完整正文。
 
 ```bash
-# 搜索文章列表
+# 搜索文章列表（仅标题、摘要、来源等元信息）
 PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py                                    # 默认搜索: 效率工具推荐、独立开发 产品、AI工具 推荐
 PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py --keyword "效率工具推荐"            # 单关键词搜索
 PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py --keywords "AI工具" "独立开发"      # 多关键词搜索
 PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py --keyword "效率工具" --limit 20     # 限制每个关键词的结果数量
 PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py --keyword "AI产品" --resolve-url    # 解析真实微信文章URL（较慢）
+
+# 搜索 + 抓取文章完整正文（需 Playwright，自动解析URL后用无头浏览器提取正文）
+PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py --keyword "独立开发" --fetch-content --limit 3
+
+# 直接抓取单篇文章正文（需已知 mp.weixin.qq.com 链接，不经过搜狗搜索，最稳定）
+PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py --url "https://mp.weixin.qq.com/s/xxx"
+PROJECT_ROOT=<项目根目录> python3 scripts/search_wechat.py --url "https://mp.weixin.qq.com/s/xxx" --output result.txt
 ```
 
-仅使用 Python 标准库，无需额外依赖。搜狗微信有反爬机制，如遇验证码导致搜索失败，稍后重试即可。
+搜索文章列表仅使用 Python 标准库，无需额外依赖。`--fetch-content` 和 `--url` 需要 Playwright：`pip install playwright && python -m playwright install chromium`。
+
+> ⚠️ 微信文章正文通过 JS 动态渲染，简单 HTTP 请求无法获取，必须用 Playwright 无头浏览器加载页面后提取。
+> ⚠️ 搜狗微信有反爬机制（URL 解析可能被限频），如遇失败稍后重试即可。`--url` 模式直接访问微信文章页，不经过搜狗，不受此限制。
+
+**推荐用法**：先用关键词搜索获取文章列表 → 从中挑选感兴趣的文章 → 用 `--url` 抓取完整正文深入了解。
 
 **推荐关键词**：`效率工具推荐`、`独立开发 产品`、`AI工具 推荐`、`小工具 推荐`、`宝藏app 推荐`
 
